@@ -1,0 +1,256 @@
+<div class="row-fluid">
+    <div class="span3 pull-left">
+        <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+                <li class="nav-header">Vragen</li>
+                <li ng-class="{active: routeIs('/questions')}"><a href="#/questions">Bekijken</a></li>
+                <li ng-class="{active: routeIs('/questions/create')}"><a href="#/questions/create">Aanmaken</a></li>
+                <li class="nav-header">Bronnen</li>
+                <li><a href="#/sources">Bekijken</a></li>
+                <li><a href="#/sources/create">Aanmaken</a></li>
+                <div ng-show="routeIs('/questions')">
+                    <li class="nav-header">Filter</li>
+                    <form class="form-horizontal">
+                        <strong>Tags</strong>
+                        <div ng-repeat="tag in tags">
+                            <label class="checkbox">
+                                <input type="checkbox" ng-model="tag.selected" ng-click="filterQuestions()">{{tag.tagname}}
+                            </label>
+                        </div>
+                        <strong>Moeilijkheidsgraad</strong>
+                        <div ng-repeat="difficultyLevel in difficultyLevels">
+                            <label class="checkbox">
+                                <input type="checkbox" ng-model="difficultyLevel.selected" ng-click="filterQuestions()">{{difficultyLevel.difficulty}}
+                            </label>
+                        </div>
+                        <strong>Vraagtype</strong>
+                        <div ng-repeat="questionType in questionTypes">
+                            <label class="checkbox">
+                                <input type="checkbox" ng-model="questionType.selected" ng-click="filterQuestions()">{{questionType.nl_translation}}
+                            </label>
+                        </div>
+                    </form>
+                </div>
+            </ul>
+        </div>
+    </div>
+    <div class="span9" ng-show="routeIs('/questions')">
+        <h1 class="page-header">Vragen:</h1>
+
+        <div ng-repeat="question in questions" class="span12 corrected_span12_width question" ng-class-even="'even_list'">
+            <section class="content span11" style="padding: 0px 5px 5px 3px">
+                <h4 style="margin-bottom: 3px;">
+                    <span class="label" style="margin-left: -20px; margin-right: 3px;" title="{{question.owner}} {{question.added_on | moment:'D MMMM YYYY'}}">?</span>
+                    {{question.question}}
+                    <span class="label">{{question.difficulty}} </span>
+                    <span class="label label-info" ng-repeat="tag in question.tags | limitTo:3" style="margin-left: 3px">{{tag}} </span>
+                </h4>
+                <ng-switch on="question.question_type">
+                    <div ng-switch-when="OpenQuestion">
+                        <div ng-model="question.answer" class="correct answer">
+                            {{question.correct_answer}}
+                        </div>
+                    </div>
+
+                    <div ng-switch-when="MultipleChoiceQuestion">
+                        <ul class="unstyled answer">
+                            <li ng-repeat="(key, value) in question.answers" ng-class="{true: 'correct', false: 'incorrect'}[key==question.correct_answer]"><strong>{{key}})</strong> {{value}} </li>
+                        </ul>
+                    </div>
+
+                    <div ng-switch-when="YesNoQuestion" class="correct answer">
+                        <div class="ng-show: question.correct_answer == true">Waar</div>
+                        <div class="ng-show: question.correct_answer == false">Onwaar</div>
+                    </div>
+
+                    <div ng-switch-when="TheoremQuestion">
+                        <ul class="unstyled answer" style="margin-bottom: 5px">
+                            <li><strong>Stelling 1:</strong> {{question.theorem1}}</li>
+                            <li><strong>Stelling 2:</strong> {{question.theorem2}}</li>
+                        </ul>
+
+                        <ul class="unstyled answer">
+                            <li ng-repeat="(key, value) in question.answers" ng-class="{true: 'correct', false: 'incorrect'}[key==question.correct_answer]"><strong>{{key}})</strong> {{value}}</li>
+                        </ul>
+                    </div>
+                </ng-switch>
+            </section>
+            <section class="content span1">
+                <div class="btn-group">
+                    <div class="btn-group btn-group-vertical" style="margin: 3px 0px;">
+                        <button class="btn btn-small" title="vraag aan proefwerk toevoegen" ng-click="openQuestionToExamModal(question)"><i class="icon-plus-sign"> </i></button>
+                        <button ng-show="isOwner(question.owner)" class="btn btn-small" title="vraag verwijderen" removequestion><i class="icon-trash"> </i></button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div modal="addQuestionToExamModal" close="closeQuestionToExamModal()">
+        <div class="modal-header">
+            <h4>{{modalHeader}}</h4>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-error" ng-show="emptyExamList == true" style="margin-bottom: 0px;">
+                Het lijkt erop dat u geen tentamen heeft. Creëer eerst een tentamen door naar de <a href="#/exams">tentamen pagina</a> te gaan.
+            </div>
+
+            <form class="form-horizontal" style="margin-bottom: 0px" ng-show="emptyExamList == false">
+                <div class="control-group" style="margin-bottom: 0px">
+                    <label class="control-label" for="examsFromUser">Proefwerk:</label>
+                    <div class="controls">
+                        <select id="examsFromUser" ng-model="selectedExam" ng-options="exam.subject for exam in examsFromUser"></select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-warning cancel" ng-click="closeQuestionToExamModal()">Annuleren</button>
+            <button class="btn btn-success" ng-click="addQuestionToExam()" ng-show="emptyExamList == false">Voeg toe</button>
+        </div>
+    </div>
+
+    <div class="span9" ng-show="routeIs('/questions/create')">
+        <h1 class="page-header">Vraag aanmaken:</h1>
+
+        <form class="form-horizontal" name="createdQuestion" ng-submit="submitQuestion()">
+            <div class="control-group alert alert-error" ng-show="addQuestionFailed == true" style="width: 500px;">
+                Het lijkt erop dast u niet alle velden correct heeft ingevuld. Vul de velden volgens de regels in en probeer het opnieuw.
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="questionType">Vraagtype:</label>
+                <div class="controls">
+                    <select id="questionType" ng-model="selectedQuestionType" ng-options="questionType.nl_translation for questionType in questionTypes" required></select>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="difficultyLevel">Moeilijkheidsgraad:</label>
+                <div class="controls">
+                    <select id="difficultyLevel" ng-model="difficultySelection" ng-options="difficultyLevel.difficulty for difficultyLevel in difficultyLevels" required></select>
+                </div>
+            </div>
+
+            <ng-switch on="selectedQuestionType.questionType">
+                <div ng-switch-when="OpenQuestion">
+                    <div class="control-group">
+                        <label class="control-label" for="openquestion">Vraag:</label>
+                        <div class="controls">
+                            <input id="openquestion" ng-model="createdQuestion.question" type="text" placeholder="Is kaas lekker?" required ng-minlength="5" ng-maxlength="128"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="answer">Antwoord:</label>
+                        <div class="controls">
+                            <input id="answer" ng-model="createdQuestion.answer" type="text" placeholder="Ja" required ng-minlength="2" ng-maxlength="128" />
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-switch-when="MultipleChoiceQuestion">
+                    <div class="control-group">
+                        <label class="control-label" for="mcquestion">Vraag:</label>
+                        <div class="controls">
+                            <input id="mcquestion" ng-model="createdQuestion.question" type="text" placeholder="Is kaas lekker?" required ng-minlength="5" ng-maxlength="128" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Antwoorden:</label>
+                        <div class="controls">
+                            <div class="input-prepend mcanswer">
+                                <span class="add-on">a</span>
+                                <input ng-model="createdQuestion.answer.a" type="text" class="span12" placeholder="geen discussie mogelijk." required ng-minlength="1" ng-maxlength="128"/>
+                            </div><br/>
+                            <div class="input-prepend mcanswer">
+                                <span class="add-on">b</span>
+                                <input ng-model="createdQuestion.answer.b" type="text" class="span12" placeholder="Ja want er zit melk in." required ng-minlength="1" ng-maxlength="128"/>
+                            </div><br/>
+                            <div class="input-prepend mcanswer">
+                                <span class="add-on">c</span>
+                                <input ng-model="createdQuestion.answer.c" type="text" class="span12" placeholder="Nee ik weet niet wat lekker is." required ng-minlength="1" ng-maxlength="128"/>
+                            </div><br/>
+                            <div class="input-prepend mcanswer">
+                                <span class="add-on">d</span>
+                                <input ng-model="createdQuestion.answer.d" type="text" class="span12" placeholder="Ja want het is geel." required ng-minlength="1" ng-maxlength="128"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Antwoord:</label>
+                        <div class="controls">
+                            <select ng-model="createdQuestion.correct_answer" required>
+                                <option value="a">a: {{createdQuestion.answer.a}}</option>
+                                <option value="b">b: {{createdQuestion.answer.b}}</option>
+                                <option value="c">c: {{createdQuestion.answer.c}}</option>
+                                <option value="d">d: {{createdQuestion.answer.d}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div ng-switch-when="YesNoQuestion" style="width: 400px">
+                    <div class="control-group">
+                        <label class="control-label" for="yesnoquestion">Stelling:</label>
+                        <div class="controls">
+                            <input id="yesnoquestion" ng-model="createdQuestion.question" type="text" placeholder="Kaas is lekker." required ng-minlength="5" ng-maxlength="128" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Antwoord:</label>
+                        <div class="controls">
+                            <input type="radio" value="True" ng-model="createdQuestion.answer" /> Waar<br/>
+                            <input type="radio" value="False" ng-model="createdQuestion.answer" /> Onwaar<br/>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-switch-when="TheoremQuestion">
+                    <div class="control-group">
+                        <label class="control-label" for="theorem1">Stelling 1:</label>
+                        <div class="controls">
+                            <input id="theorem1" ng-model="createdQuestion.theorem1" type="text" placeholder="Kaas is lekker." required ng-minlength="5" ng-maxlength="128" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="theorem2">Stelling 2:</label>
+                        <div class="controls">
+                            <input id="theorem2" ng-model="createdQuestion.theorem2" type="text" placeholder="Kaas is niet vies." required ng-minlength="5" ng-maxlength="128" />
+                        </div>
+                    </div>
+                    <div class="control-group" style="width: 400px">
+                        <label class="control-label">Antwoord: </label>
+                        <div class="controls">
+                            <input type="radio" value="a" ng-model="createdQuestion.answer">
+                            Stelling 1 is waar en stelling 2 is niet waar <br/>
+                            <input type="radio" value="b" ng-model="createdQuestion.answer">
+                            Stelling 2 is waar en stelling 1 is niet waar <br/>
+                            <input type="radio" value="c" ng-model="createdQuestion.answer">
+                            Beide stellingen zijn waar <br/>
+                            <input type="radio" value="d" ng-model="createdQuestion.answer">
+                            Beide stellingen zijn niet waar <br/>
+                        </div>
+                    </div>
+                </div>
+            </ng-switch>
+
+            <div class="control-group">
+                <label class="control-label" for="tags">Tags:</label>
+                <div class="controls">
+                    <div class="chosen">
+                        <select id="tags" data-placeholder="Kies een aantal tags" multiple chosen
+                                ng-model="selectedTags" ng-options="tag.tagname for tag in tags" required>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" class="btn btn-primary" style="margin-left: 85px" value="Vraag toevoegen" ng-disabled="createdQuestion.$invalid" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

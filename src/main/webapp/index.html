@@ -1,0 +1,72 @@
+<!doctype html>
+<!--<html lang="nl" ng-app="HAN-Nito" manifest="han-nito.appcache">-->
+<html lang="nl" ng-app="HAN-Nito">
+<head>
+  <meta charset="utf-8">
+  <title>HAN-Nito</title>
+
+  <meta name="description" content="HAN-Nito is the result of an 8 week collaboration between 2 programmers and 2 designers who had to build a
+                                    webapplication on which teachers of HAN University of Applied Sciences could create and generate exams. This collaboration
+                                    happened during the project stage of the CRIA semester given at the HAN University of Applied Sciences." />
+  <meta name="author" content="Wouter" />
+  <meta name="robots" content="index, nofollow">
+
+
+  <link href="css/bootstrap.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="lib/toastr/toastr.css"/>
+  <link href="img/favicon.png" rel="icon" type="image/x-icon" />
+
+  <!--[if lte IE 8]>
+  <script src="lib/angular-ui-ieshiv.js"></script>
+  <![endif]-->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+  <div class="navbar navbar-inverse navbar-fixed-top" ng-controller="NavbarController">
+      <div class="navbar-inner">
+          <div class="container">
+              <p><a class="brand" href="#/"><img src="img/HAN Nito 80.png" alt="HAN-Nito" /></a>
+              <ul class="nav">
+                  <li ng-class="{active: routeIs('/')}"><a href="#/">Homepagina</a></li>
+                  <li ng-class="{active: routeIs('/exams') || routeIs('/exams/create')}" ng-show="username != null"><a href="#/exams">Tentamens</a></li>
+                  <li ng-class="{active: routeIs('/questions') || routeIs('/questions/create') || routeIs('/sources') ||
+                                         routeIs('/sources/create')}" ng-show="username != null"><a href="#/questions">Vragen</a></li>
+              </ul>
+              <ul class="nav pull-right">
+                  <li ng-class="{active: routeIs('/register')}" ng-show="username == null"><a href="#/register">Registreren</a></li>
+                  <li ng-class="{active: routeIs('/login')}" ng-show="username == null"><a href="#/login">Inloggen</a></li>
+                  <li ng-show="username != null"><a ng-click="logout()">Ingelogd als {{username}}, Logout</a></li>
+              </ul>
+              </p>
+          </div>
+      </div>
+  </div>
+
+  <div ng-view class="container"></div>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="lib/jquery-ui/jquery-ui-1.9.2.custom.min.js"></script>
+  <link href="lib/jquery-ui/jquery-ui-1.9.2.custom.min.css" />
+  <script src="lib/jquery-ui/jquery.ui.touch-punch.min.js"></script>
+  <script src="lib/toastr/toastr.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js"></script>
+  <script src="lib/angular/angular-resource.js"></script>
+  <script src="lib/angular/angular-sanitize.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/controllers.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/directives.js"></script>
+
+  <script src="lib/angular-ui/angular-ui.js"></script>
+  <script src="lib/underscorejs/underscore.js"></script>
+
+  <script src="lib/chosen/chosen.jquery.min.js"></script>
+  <script src="lib/momentjs/moment.min.js"></script>
+  <script src="lib/amplify-store/amplify.store.min.js"></script>
+  <script src="lib/jasny-bootstrap/bootstrap-fileupload.js"></script>
+</body>
+</html>

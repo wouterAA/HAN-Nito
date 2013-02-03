@@ -1,0 +1,11 @@
+<form class="form-signin clearfix" name="credentials" ng-submit="login()">
+    <h2 class="form-signin-heading">Inloggen</h2>
+    <div class="alert alert-error" ng-show="loginError != null">
+        {{loginError}}
+    </div>
+    <input type="text" class="input-block-level" placeholder="Identifier"
+           required ng-minlength="3" ng-maxlength="32" ng-pattern="/^[A-Za-z0-9-_\.@]{2,32}$/" ng-model="credentials.identifier">
+    <input type="password" class="input-block-level" placeholder="Password"
+           required ng-minlength="6" ng-maxlength="20" ng-pattern="/^[A-Za-z0-9!@#$%^&*()_]{6,20}$/" ng-model="credentials.password">
+    <button class="btn btn-large btn-primary pull-right" type="submit" ng-disabled="credentials.$invalid">Inloggen</button>
+</form>

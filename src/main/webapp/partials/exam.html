@@ -1,0 +1,120 @@
+<div class="row-fluid">
+    <div class="span3 pull-left">
+        <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+                <li class="nav-header">Filter Beschikbare Vragen</li>
+                <form class="form-horizontal">
+                    <strong>Tags</strong>
+                    <div ng-repeat="tag in tags">
+                        <label class="checkbox">
+                            <input type="checkbox" ng-model="tag.selected" ng-click="filterQuestions()">{{tag.tagname}}
+                        </label>
+                    </div>
+                    <strong>Moeilijkheidsgraad</strong>
+                    <div ng-repeat="difficultyLevel in difficultyLevels">
+                        <label class="checkbox">
+                            <input type="checkbox" ng-model="difficultyLevel.selected" ng-click="filterQuestions()">{{difficultyLevel.difficulty}}
+                        </label>
+                    </div>
+                    <strong>Vraagtype</strong>
+                    <div ng-repeat="questionType in questionTypes">
+                        <label class="checkbox">
+                            <input type="checkbox" ng-model="questionType.selected" ng-click="filterQuestions()">{{questionType.nl_translation}}
+                        </label>
+                    </div>
+                </form>
+            </ul>
+        </div>
+    </div>
+
+    <div class="span9">
+        <h1 class="page-header">Bewerk tentamen:</h1>
+        <cite class="">Sleep vragen om ze in of uit het proefwerk te plaatsen en om de volgorde te veranderen. Of u kunt <a href="#/questions/create" style="color: blue;">hier</a> een vraag aanmaken.</cite>
+        <div class="span12" style="margin-left: 0px">
+            <div class="span6" >
+                <h3>Beschikbare vragen:</h3>
+                <ul id="sourceList" class="unstyled clearfix" dnd-between-list="questions,targetList" style="min-height: 500px;">
+                    <li ng-repeat="question in questions" class="span12 slidein" style="margin-left: 0px; cursor: move;" ng-class-even="'even_list'">
+                        <div style="padding: 5px">
+                            <h5 style="margin: 2px 0px">{{question.question}}
+                                <span class="label">{{question.difficulty}} </span>
+                                <span class="label label-info" ng-repeat="tag in question.tags | limitTo:3" style="margin-left: 3px">{{tag}} </span>
+                            </h5>
+                            <ng-switch on="question.question_type">
+                                <div ng-switch-when="OpenQuestion">
+                                    <div ng-model="question.answer" class="correct answer">
+                                        {{question.correct_answer}}
+                                    </div>
+                                </div>
+
+                                <div ng-switch-when="MultipleChoiceQuestion">
+                                    <ul class="unstyled answer">
+                                        <li ng-repeat="(key, value) in question.answers" ng-class="{true: 'correct', false: 'incorrect'}[key==question.correct_answer]"><strong>{{key}})</strong> {{value}} </li>
+                                    </ul>
+                                </div>
+
+                                <div ng-switch-when="YesNoQuestion" class="correct answer">
+                                    <div class="ng-show: question.correct_answer == true">Waar</div>
+                                    <div class="ng-show: question.correct_answer == false">Onwaar</div>
+                                </div>
+
+                                <div ng-switch-when="TheoremQuestion">
+                                    <ul class="unstyled answer" style="margin-bottom: 5px">
+                                        <li><strong>Stelling 1:</strong> {{question.theorem1}}</li>
+                                        <li><strong>Stelling 2:</strong> {{question.theorem2}}</li>
+                                    </ul>
+
+                                    <ul class="unstyled answer">
+                                        <li ng-repeat="(key, value) in question.answers" ng-class="{true: 'correct', false: 'incorrect'}[key==question.correct_answer]"><strong>{{key}})</strong> {{value}}</li>
+                                    </ul>
+                                </div>
+                            </ng-switch>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="span6">
+                <h3>Vragen in het proefwerk:</h3>
+                <ul id="targetList" class="unstyled clearfix" dnd-between-list="exam.questions,sourceList" style="min-height: 500px">
+                    <li ng-repeat="question in exam.questions" class="span12" style="margin-left: 0px; cursor: move;" ng-class-even="'even_list'">
+                        <div style="padding: 5px">
+                            <h5 style="margin: 2px 0px">{{$index + 1}}) {{question.question}}
+                                <span class="label">{{question.difficulty}} </span>
+                                <span class="label label-info" ng-repeat="tag in question.tags | limitTo:3" style="margin-left: 3px">{{tag}} </span>
+                            </h5>
+                            <ng-switch on="question.question_type">
+                                <div ng-switch-when="OpenQuestion">
+                                    <div ng-model="question.answer" class="correct answer">
+                                        {{question.correct_answer}}
+                                    </div>
+                                </div>
+
+                                <div ng-switch-when="MultipleChoiceQuestion">
+                                    <ul class="unstyled answer">
+                                        <li ng-repeat="(key, value) in question.answers" ng-class="{true: 'correct', false: 'incorrect'}[key==question.correct_answer]"><strong>{{key}})</strong> {{value}} </li>
+                                    </ul>
+                                </div>
+
+                                <div ng-switch-when="YesNoQuestion" class="correct answer">
+                                    <div class="ng-show: question.correct_answer == true">Waar</div>
+                                    <div class="ng-show: question.correct_answer == false">Onwaar</div>
+                                </div>
+
+                                <div ng-switch-when="TheoremQuestion">
+                                    <ul class="unstyled answer" style="margin-bottom: 5px">
+                                        <li><strong>Stelling 1:</strong> {{question.theorem1}}</li>
+                                        <li><strong>Stelling 2:</strong> {{question.theorem2}}</li>
+                                    </ul>
+
+                                    <ul class="unstyled answer">
+                                        <li ng-repeat="(key, value) in question.answers" ng-class="{true: 'correct', false: 'incorrect'}[key==question.correct_answer]"><strong>{{key}})</strong> {{value}}</li>
+                                    </ul>
+                                </div>
+                            </ng-switch>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

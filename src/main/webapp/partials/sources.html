@@ -1,0 +1,81 @@
+<div class="row-fluid">
+    <div class="span3 pull-left">
+        <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+                <li class="nav-header">Vragen</li>
+                <li><a href="#/questions">Bekijken</a></li>
+                <li><a href="#/questions/create">Aanmaken</a></li>
+                <li class="nav-header">Bronnen</li>
+                <li ng-class="{active: routeIs('/sources')}"><a href="#/sources">Bekijken</a></li>
+                <li ng-class="{active: routeIs('/sources/create')}"><a href="#/sources/create">Aanmaken</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="span9" ng-show="routeIs('/sources')">
+        <h1 class="page-header">Bronnen:</h1>
+
+        <div ng-repeat="source in sources" class="span12 corrected_span12_width" ng-class-even="'even_list'">
+            <ng-switch on="source.source_type">
+                <div ng-switch-when="image">
+                    <div class="span11">
+                        <div class="span2">
+                            <img ng-src="{{url}}/images/{{source.thumbnail}}" class="img-polaroid" style="width: 75px; height: 75px; margin: 5px">
+                        </div>
+                        <div class="span10">
+                            <h4>{{source.owner}} - {{source.added_on | moment:'D MMMM YYYY'}} <span class="label label-info">{{source.questions.length}} vragen</span></h4>
+                            <p>Een prachtige wallpaper van een bos some fancy story and stuff. Blabla Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus..</p>
+                        </div>
+                    </div>
+                    <div class="span1">
+                        <button ng-show="isOwner(source.owner)" class="btn btn-small" title="vragen aan bron toevoegen"><i class="icon-plus-sign"> </i></button>
+                        <button ng-show="isOwner(source.owner)" class="btn btn-small" title="verwijder bron" ng-click="deleteSource(source)"><i class="icon-trash"> </i></button>
+                    </div>
+                </div>
+            </ng-switch>
+        </div>
+    </div>
+
+    <div class="span9" ng-show="routeIs('/sources/create')">
+        <h1 class="page-header">Bron aanmaken:</h1>
+
+        <form class="form-horizontal" name="createdSource" ng-submit="submitSource()">
+            <div class="control-group">
+                <label class="control-label" for="sourceType">BronType:</label>
+                <div class="controls">
+                    <select id="sourceType" ng-model="selectedSourceType" ng-options="sourceType.nl_translation for sourceType in sourceTypes"></select>
+                </div>
+            </div>
+
+            <ng-switch on="selectedSourceType.sourceType">
+                <div ng-switch-when="image">
+                    <div class="control-group">
+                        <label class="control-label" for="image">Plaatje:</label>
+                        <div class="controls">
+                            <div fileupload class="fileupload fileupload-new" data-provides="fileupload">
+                                <div class="input-append">
+                                    <div id="image" class="uneditable-input span3" style="width: 136px">
+                                        <i class="icon-file fileupload-exists"></i>
+                                        <span class="fileupload-preview"></span>
+                                    </div>
+                                    <span class="btn btn-file">
+                                        <span class="fileupload-new" id="image_selector">Selecteer</span>
+                                        <span class="fileupload-exists">Verander</span>
+                                        <input id="fileInput" type="file" required />
+                                    </span>
+                                    <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Verwijder</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-switch>
+
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" class="btn btn-primary" style="margin-left: 92px" value="Bron toevoegen" ng-disabled="createdSource.$invalid" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

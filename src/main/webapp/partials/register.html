@@ -1,0 +1,18 @@
+<form class="form-signin clearfix" name="registration" ng-submit="register()">
+    <h2 class="form-register-heading">Registreer</h2>
+    <div class="alert alert-error" ng-show="registerError != null">
+        {{registerError}}
+    </div>
+
+    <input ng-required type="text" name="username" placeholder="Gebruikersnaam" class="input-block-level"
+           ng-model="registration.username" ng-minlength="3" ng-maxlength="25"
+           ng-pattern="/^[A-Za-z0-9_]{2,20}$/">
+
+    <input ng-repuired type="email" name="email" placeholder="Email" class="input-block-level"
+           ng-model="registration.email" ng-minlengt="5" ng-maxlength="32">
+
+    <input ng-required type="password" name="password" placeholder="Wachtwoord" class="input-block-level"
+           ng-model="registration.password" ng-minlength="6" ng-maxlength="20"
+           ng-pattern="/^[A-Za-z0-9!@#$%^&*()_]{6,20}$/">
+    <button class="btn btn-large btn-primary pull-right" type="submit" ng-disabled="registration.$invalid">Registreren</button>
+</form>

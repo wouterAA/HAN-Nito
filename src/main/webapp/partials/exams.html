@@ -1,0 +1,121 @@
+<div class="row-fluid">
+    <div class="span3 pull-left">
+        <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+                <li class="nav-header">Tentamens</li>
+                <li ng-class="{active: routeIs('/exams')}"><a href="#/exams">Bekijken</a></li>
+                <li ng-class="{active: routeIs('/exams/create')}"><a href="#/exams/create">Aanmaken</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="span9" ng-show="routeIs('/exams')">
+        <h1 class="page-header">Tentamens:</h1>
+
+        <div ng-repeat="exam in exams" class="span12 corrected_span12_width" ng-class-even="'even_list'">
+            <section class="content span10">
+            <h4 style="margin-bottom: 0px">
+                <a href="#/exam/{{exam._id.$oid}}">{{exam.subject}}</a>
+            </h4>
+            <small style="margin-left: 15px">{{exam.questions.length + exam.source_questions.length}} vragen - {{exam.owner}} - {{exam.added_on | moment:'D MMMM YYYY'}}</small>
+        </section>
+            <section class="content span2">
+                <div class="btn-group">                				
+                    <div class="btn-group btn-group-horizontal" style="margin: 4px 0px 0px -20px;">                    				
+                        <button class="btn btn-small" title="download pdf" ng-click="showGeneratePDFModal(exam)"><i class="icon-download"></i></button>
+                        <a href="#/exam/{{exam._id.$oid}}" ><button ng-show="isOwner(exam.owner)" class="btn btn-small" title="bewerk tentamen" ><i class="icon-edit"></i></button></a>
+                        <button ng-show="isOwner(exam.owner)" class="btn btn-small" title="verwijder proefwerk" ng-click="deleteExam(exam)" removeexam><i class="icon-trash"> </i></button>
+                    </div>                				
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div modal="generatePDFModal" close="closeGeneratePDFModal()">
+        <form class="form-horizontal" name="pdfDetails" ng-submit="generatePDFFromExam()" style="margin-bottom: 0px">
+            <div class="modal-header">
+                <h4>{{modalHeader}}</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="control-group">
+                    <label class="control-label" for="semester">Semester:</label>
+                    <div class="controls">
+                        <input type="text" placeholder="CRIA" id="semester" ng-model="pdfDetails.semester" required ng-minlength="3" ng-maxlength="32"  />
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="course">Course:</label>
+                    <div class="controls">
+                        <input type="text" placeholder="Web technology" id="course" ng-model="pdfDetails.course" required ng-minlength="3" ng-maxlength="32" />
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="date">Datum afname:</label>
+                    <div class="controls">
+                        <input type="text" placeholder="DD-MM-YYYY" id="date" ng-model="pdfDetails.date" required ng-minlength="10" ng-maxlength="10" ng-pattern="/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/" />
+                    </div>
+                </div>
+
+                <div class="control-group" style="margin-bottom: 0px; margin-top: 0px;">
+                    <label class="control-label" for="duration">Tijdsduur:</label>
+                    <div class="controls">
+                        <div class="input-append">
+                            <input type="number" placeholder="90" id="duration" ng-model="pdfDetails.duration" required ng-minlength="1" ng-maxlength="3" style="width: 145px" ng-pattern="/^[0-9]{1,3}/" />
+                            <span class="add-on">minuten</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-warning cancel" ng-click="closeGeneratePDFModal()">Annuleren</button>
+                <button class="btn btn-success" type="submit" ng-disabled="pdfDetails.$invalid">Genereer PDF</button>
+            </div>
+        </form>
+    </div>
+
+    <div modal="getUrlsForPDFsModal" close="closeGetUrlsForPDFsModal()">
+        <div class="modal-header">
+            <h4>{{modalHeader}}</h4>
+        </div>
+        <div class="modal-body">
+            <p>Vanwege een brakke cross browser implementatie van window.new(url, target) heeft u hier 2 links om op te klikken, veel success ermee.</p>
+            <ul class="unstyled">
+                <li><a href="{{url}}/exams/{{examToGeneratePDFFor._id.$oid}}.pdf?semester={{pdfDetails.semester}}&course={{pdfDetails.course}}&date={{dateInMillis}}&duration={{pdfDetails.duration}}" alt='download tentamen' hreflang='nl' media='application/pdf' target='_blank'>Download tentamen</a></li>
+                <li><a href="{{url}}/exams/{{examToGeneratePDFFor._id.$oid}}_answers.pdf?semester={{pdfDetails.semester}}&course={{pdfDetails.course}}&date={{dateInMillis}}&duration={{pdfDetails.duration}}" alt='download tentamen' hreflang='nl' media='application/pdf' target='_blank'>Download antwoordvel</a></li>
+            </ul>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-warning cancel" ng-click="closeGetUrlsForPDFsModal()">Sluiten</button>
+        </div>
+    </div>
+
+    <div class="span9" ng-show="routeIs('/exams/create')">
+        <h1 class="page-header">Tentamen maken:</h1>
+
+        <form class="form-horizontal" name="createdExam" ng-submit="submitExam()">
+            <div class="control-group">
+                <label class="control-label" for="subject">Onderwerp:</label>
+                <div class="controls">
+                    <input id="subject" ng-model="subject" type="text" placeholder="CRIA - WT Toets" required ng-minlength="3" ng-maxlength="32" />
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="introduction">Introductie:</label>
+                <div class="controls">
+                    <textarea id="introduction" style="resize: vertical"  ng-model="introduction" rows="5" placeholder="Geen telefoons toegestaan etc" />
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" class="btn btn-primary" style="margin-left: 75px" value="Examen aanmaken" ng-disabled="createdExam.$invalid" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
