@@ -47,9 +47,10 @@ public class MongoConnection {
      */
     public DB getDB() {
         try {
-            MongoClient mongoClient = new MongoClient("www.han-nito.nl", 27017);
+            MongoClient mongoClient = new MongoClient("127.0.0.1", 27017);
             db = mongoClient.getDB("HAN-Nito");
-            boolean auth = db.authenticate("admin", "ekw3kohd".toCharArray());
+            //uncomment and replace 'username' and 'password' to use authentication with mongodb
+            //boolean auth = db.authenticate("username", "password".toCharArray());
         } catch (UnknownHostException ex) {
             Logger.getLogger(MongoConnection.class.getName()).log(Level.SEVERE, null, ex);
         }

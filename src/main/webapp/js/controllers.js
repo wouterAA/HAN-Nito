@@ -59,7 +59,7 @@ function LoginCtrl($scope, $location, AccountService, PathAuthenticator) {
     /** Gets called when the user wants to login **/
     $scope.login = function() {
         AccountService.login($scope.credentials);
-    }
+    };
 
     /** Gets called when logging in succeeded **/
     $scope.$on("AccountService.login", function(event) {

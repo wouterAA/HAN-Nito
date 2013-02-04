@@ -3,6 +3,8 @@ package nl.hannito.filters;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import java.util.Arrays;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.WebApplicationException;
@@ -37,10 +39,7 @@ public class RestAuthenticationFilter implements ContainerRequestFilter {
      * @return Cut url
      */
     private String getAPIUrl(String url) {
-        url = url.split("/HAN-Nito")[1];
-        if(url.startsWith("/api")) {
-            url = url.split("/api")[1];
-        }
+        url = url.split("/api")[1];
         return url;
     }
     
